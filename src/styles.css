@@ -1,4 +1,11 @@
+html {
+  font-size: 10px;
+}
+
 body {
-  font-family: 'Open Sans', sans-serif;
-  text-align: center;
+  background-color: black;
+  color: white;
+  font-family: 'Mukta', 'Open Sans', sans-serif;
+  font-size: 1.3rem;
+  line-height: 1em;
 }

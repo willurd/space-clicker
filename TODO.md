@@ -16,7 +16,8 @@
 **Architecture**
 
 - [ ] Prototype one basic game mechanic.
-  - [ ] Two places: A space station and an asteroid belt.
+  - [x] There are two places: A space station and an asteroid belt.
+  - [ ] There is a coordinate system where the center point is the origin.
   - [ ] A view showing those two places, their relative locations, and where you are.
   - [ ] A component that lets you choose a location within your current system to travel to.
   - [ ] Travel takes real time to complete.
@@ -29,7 +30,7 @@
   - [ ] You can travel to other asteroids to mine them.
   - [ ] You can see what is in your inventory.
   - [ ] Once your inventory is full, you can travel back to the space station and either deposit
-        your ore in your station inventory, or sell it.
+        your ore in your station inventory (use BigInt for arbitrarily-large numbers), or sell it.
   - [ ] Travel back to the asteroid belt and repeat.
 - [ ] Figure out how systems will work.
   - [ ] A system provides data and actions, and a way to listen for changes.
@@ -70,10 +71,18 @@ Basically it's kind of like a space RPG played out entirely in the browser using
 
 **Questions**
 
-- [ ] Are there any parts about what I've mentioned so far, or any other part about how Eve works,
-      that wouldn't work as a browser-based "menu" game?
-- [ ] Are there any other games I can take inspiration from?
-  - [ ] Star Citizen?
-  - [ ] Neopets? (if you've ever played it. In my head it has kind of that same style. It's a website.
-        That's also a game. That's a website.)
-- [ ] Any novel mechanics I can add?
+- Are there any parts about what I've mentioned so far, or any other part about how Eve works,
+  that wouldn't work as a browser-based "menu" game?
+- Are there any other games I can take inspiration from?
+  - Star Citizen?
+  - Elite Dangerous.
+    - Long range haul missions.
+    - Passenger missions.
+  - Neopets? (if you've ever played it. In my head it has kind of that same style. It's a website.
+    That's also a game. That's a website.)
+- Any novel mechanics I can add?
+  - Fleets
+    - Maybe you control a fleet in addition to your own ship.
+    - You can hire new crew, promote them, etc.
+    - You can assign crew members to tasks (such as "Ming X ore in Y system") and they will
+      automatically do them.
