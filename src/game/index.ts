@@ -7,6 +7,7 @@
 import uuid from 'uuid';
 import EventEmitter from 'events';
 import debounce from 'lodash/debounce';
+import { clamp } from 'game/utils';
 
 // These could be used for names of unidentified ores, alien ships, space anomolies, star systems, etc.
 export const glyphs = 'आईऊऋॠऌॡऐऔऎअंअँकखगघङचछजझञटठडढणतथदधनपफबभयरवळशषसह'.split('');
@@ -105,9 +106,9 @@ export class StarSystem extends Entity {
 export class GameLocation {
   system?: string;
   waypoint?: string;
-  pos?: Point;
+  pos?: void | Point;
 
-  constructor(system?: string, waypoint?: string, pos?: Point) {
+  constructor(system?: string, waypoint?: string, pos?: void | Point) {
     this.system = system;
     this.waypoint = waypoint;
     this.pos = pos;
@@ -131,6 +132,10 @@ export class Travel {
 
   get isDone(): boolean {
     return this.timeRemaining <= 0;
+  }
+
+  get percentComplete(): number {
+    return clamp(0, 1, (this.tripTime - this.timeRemaining) / this.tripTime);
   }
 
   tick(): void {
@@ -164,7 +169,7 @@ export type GameState = {
   currentLocation?: {
     system?: string;
     waypoint?: string;
-    pos?: { x: number; y: number };
+    pos?: void | { x: number; y: number };
   };
 };
 
@@ -178,7 +183,7 @@ export class Game extends EventEmitter {
   currentLocation: GameLocation;
   travel?: Travel;
 
-  constructor(state?: GameState, options: GameOptions) {
+  constructor(state: void | GameState, options: GameOptions) {
     super();
     this.systems = entityArrayToMap(options.systems);
     this.currentLocation = options.currentLocation;
@@ -199,7 +204,7 @@ export class Game extends EventEmitter {
     saveGameState(this.getState());
   }, 500);
 
-  setState(state?: GameState): void {
+  setState(state?: void | GameState): void {
     if (!state) {
       return;
     }
@@ -273,17 +278,32 @@ export class Game extends EventEmitter {
       return;
     }
 
-    this.travel = new Travel(this.currentLocation, new GameLocation(this.currentLocation.system, id), 5000);
+    this.travel = new Travel(
+      new GameLocation(this.currentLocation.system, this.currentLocation.waypoint, this.currentPosition),
+      new GameLocation(this.currentLocation.system, id, waypoint.pos),
+      5000,
+    );
     this.gameChanged();
 
     let intervalId = setInterval(() => {
       this.travel.tick();
+      const { from, to } = this.travel;
+
+      if (from.pos && to.pos) {
+        // Show your ship's current location as it is traveling.
+        this.currentLocation.pos = new Point(
+          from.pos.x - (from.pos.x - to.pos.x) * this.travel.percentComplete,
+          from.pos.y - (from.pos.y - to.pos.y) * this.travel.percentComplete,
+        );
+      }
+
       this.gameChanged();
 
       if (this.travel.isDone) {
         this.travel = undefined;
         clearInterval(intervalId);
         this.currentLocation.waypoint = id;
+        this.currentLocation.pos = undefined;
         this.gameChanged();
       }
     }, 50);

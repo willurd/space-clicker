@@ -1,13 +1,9 @@
 import * as React from 'react';
 import styled from 'styled-components';
-import useGame from 'game/useGame';
 import { Point, Map, Entity, SpaceStation, AsteroidBelt } from 'game';
+import useGame from 'game/useGame';
+import { cartesianToWebCoords } from 'game/coords';
 import { Icon, HBox } from 'ui';
-
-const cartesianToWebCoords = (pos: Point, map: Map) => ({
-  top: pos.y + map.topLeft.y,
-  left: pos.x - map.topLeft.x,
-});
 
 const waypointToIconName = (waypoint: Entity) => {
   // TODO: Think of a better way to do this.
@@ -49,7 +45,7 @@ const Waypoint = ({ waypoint, map }) => {
 const Player = ({ pos, map }) => {
   return (
     <StyledWaypoint webPos={cartesianToWebCoords(pos, map)}>
-      <Icon name="location-arrow" color="fuchsia" size={20} fontSize={20} />
+      <Icon name="dot-circle" type="solid" color="fuchsia" size={20} fontSize={20} />
     </StyledWaypoint>
   );
 };
