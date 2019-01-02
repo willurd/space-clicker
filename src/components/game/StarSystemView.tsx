@@ -2,14 +2,7 @@ import * as React from 'react';
 import styled from 'styled-components';
 import useGame from 'game/useGame';
 import { Point, Map, Entity, SpaceStation, AsteroidBelt } from 'game';
-import { Icon } from 'ui';
-
-const StyledWaypoint = styled.span`
-  display: inline-block;
-  left: ${props => props.webPos.left}px;
-  position: absolute;
-  top: ${props => props.webPos.top}px;
-`;
+import { Icon, HBox } from 'ui';
 
 const cartesianToWebCoords = (pos: Point, map: Map) => ({
   top: pos.y + map.topLeft.y,
@@ -19,7 +12,7 @@ const cartesianToWebCoords = (pos: Point, map: Map) => ({
 const waypointToIconName = (waypoint: Entity) => {
   // TODO: Think of a better way to do this.
   if (waypoint instanceof SpaceStation) {
-    return 'artstation';
+    return 'charging-station';
   } else if (waypoint instanceof AsteroidBelt) {
     return 'asterisk';
   } else {
@@ -27,10 +20,28 @@ const waypointToIconName = (waypoint: Entity) => {
   }
 };
 
+const StyledWaypoint = styled(HBox)`
+  align-items: flex-start;
+  display: inline-block;
+  left: ${props => props.webPos.left}px;
+  position: absolute;
+  top: ${props => props.webPos.top}px;
+`;
+
+const WaypointName = styled.span`
+  display: inline-block;
+  font-size: 1rem;
+  vertical-align: top;
+  margin: 3px 0 0 10px;
+`;
+
 const Waypoint = ({ waypoint, map }) => {
+  const webPos = cartesianToWebCoords(waypoint.pos, map);
+
   return (
-    <StyledWaypoint pos={waypoint.pos} webPos={cartesianToWebCoords(waypoint.pos, map)}>
+    <StyledWaypoint pos={waypoint.pos} webPos={webPos}>
       <Icon name={waypointToIconName(waypoint)} />
+      <WaypointName>{waypoint.name}</WaypointName>
     </StyledWaypoint>
   );
 };
@@ -38,7 +49,7 @@ const Waypoint = ({ waypoint, map }) => {
 const Player = ({ pos, map }) => {
   return (
     <StyledWaypoint webPos={cartesianToWebCoords(pos, map)}>
-      <Icon name="location-arrow" color="white" />
+      <Icon name="location-arrow" color="fuchsia" size={20} fontSize={20} />
     </StyledWaypoint>
   );
 };
@@ -68,16 +79,6 @@ const StarSystemView = () => {
   }
 
   const map = system.map;
-
-  console.log({ system, waypoint, pos });
-
-  console.log(
-    system.waypointList.map(waypoint => ({
-      pos: waypoint.pos,
-      map,
-      webPos: cartesianToWebCoords(waypoint.pos, map),
-    })),
-  );
 
   return (
     <StyledStarSystemView width={map.width} height={map.height}>

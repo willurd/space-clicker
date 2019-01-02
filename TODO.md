@@ -18,7 +18,8 @@
 - [ ] Prototype one basic game mechanic.
   - [x] There are two places: A space station and an asteroid belt.
   - [x] There is a coordinate system where the center point is the origin.
-  - [ ] A view showing those two places, their relative locations, and where you are.
+  - [x] A view showing those two places, their relative locations, and where you are.
+  - [ ] Your position is animated/updated as you travel to other locations.
   - [ ] A component that lets you choose a location within your current system to travel to.
   - [ ] Travel takes real time to complete.
   - [ ] When you're in the astroid belt, you can see all of the asteroids that are there, what their
