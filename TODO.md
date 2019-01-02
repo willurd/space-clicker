@@ -19,7 +19,7 @@
   - [x] There are two places: A space station and an asteroid belt.
   - [x] There is a coordinate system where the center point is the origin.
   - [x] A view showing those two places, their relative locations, and where you are.
-  - [ ] Your position is animated/updated as you travel to other locations.
+  - [x] Your position is animated/updated as you travel to other locations.
   - [ ] A component that lets you choose a location within your current system to travel to.
   - [ ] Travel takes real time to complete.
   - [ ] When you're in the astroid belt, you can see all of the asteroids that are there, what their
@@ -38,6 +38,7 @@
       - 1. "Engaging hyper drive" (5s)
       - 2. Traveling (time based on distance)
       - 3. Disengaging/stopping
+    - [ ] You can stop traveling mid trip and change course.
 - [ ] Figure out how systems will work.
   - [ ] A system provides data and actions, and a way to listen for changes.
   - [ ] A system can depend on other systems.
