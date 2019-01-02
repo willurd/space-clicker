@@ -2,7 +2,7 @@ import * as React from 'react';
 import styled from 'styled-components';
 
 const StyledIcon = styled.span`
-  color: #999;
+  color: ${props => props.color};
   display: inline-block;
   height: ${props => ('height' in props ? props.height : props.size)}px;
   text-align: center;
@@ -10,6 +10,7 @@ const StyledIcon = styled.span`
 `;
 
 StyledIcon.defaultProps = {
+  color: '#999',
   size: 16,
 };
 

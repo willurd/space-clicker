@@ -86,11 +86,13 @@ const CurrentLocation = () => {
           <Icon name="sun" size={30} />
           <span>{game.currentSystem.name}</span>
         </li>
-        <li>
-          <button onClick={onTravelClick} disabled={game.isTraveling}>
-            Travel to {game.currentWaypoint instanceof SpaceStation ? 'Asteroid Belt' : 'Space Station'}
-          </button>
-        </li>
+        {!game.isTraveling && (
+          <li>
+            <button onClick={onTravelClick}>
+              Travel to {game.currentWaypoint instanceof SpaceStation ? 'Asteroid Belt' : 'Space Station'}
+            </button>
+          </li>
+        )}
       </ul>
     </StyledCurrentLocation>
   );

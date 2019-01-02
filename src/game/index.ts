@@ -6,6 +6,7 @@
 
 import uuid from 'uuid';
 import EventEmitter from 'events';
+import debounce from 'lodash/debounce';
 
 // These could be used for names of unidentified ores, alien ships, space anomolies, star systems, etc.
 export const glyphs = 'आईऊऋॠऌॡऐऔऎअंअँकखगघङचछजझञटठडढणतथदधनपफबभयरवळशषसह'.split('');
@@ -55,6 +56,14 @@ export class Map {
     this.topLeft = topLeft;
     this.bottomRight = bottomRight;
   }
+
+  get width(): number {
+    return this.bottomRight.x - this.topLeft.x;
+  }
+
+  get height(): number {
+    return this.topLeft.y - this.bottomRight.y;
+  }
 }
 
 export class SpaceStation extends Entity {
@@ -82,6 +91,14 @@ export class StarSystem extends Entity {
 
   hasWaypoint(id: string): boolean {
     return !!this.waypoints[id];
+  }
+
+  getWaypoint(id: string): void | Entity {
+    return this.waypoints[id];
+  }
+
+  get waypointList(): Array<Entity> {
+    return Object.keys(this.waypoints).map(id => this.getWaypoint(id) as Entity);
   }
 }
 
@@ -127,7 +144,7 @@ export class Travel {
 export const exampleSystem = new StarSystem({
   id: '75892086-3aaf-401e-99ba-114db5d76dbf',
   name: 'Example System',
-  map: new Map(new Point(-250, -250), new Point(250, 250)),
+  map: new Map(new Point(-250, 250), new Point(250, -250)),
   pos: new Point(50, 50), // Star systems have positions within the galaxy.
   waypoints: [
     new SpaceStation({
@@ -143,6 +160,14 @@ export const exampleSystem = new StarSystem({
   ],
 });
 
+export type GameState = {
+  currentLocation?: {
+    system?: string;
+    waypoint?: string;
+    pos?: { x: number; y: number };
+  };
+};
+
 export type GameOptions = {
   systems: Array<StarSystem>;
   currentLocation: GameLocation;
@@ -153,16 +178,43 @@ export class Game extends EventEmitter {
   currentLocation: GameLocation;
   travel?: Travel;
 
-  constructor(options: GameOptions) {
+  constructor(state?: GameState, options: GameOptions) {
     super();
     this.systems = entityArrayToMap(options.systems);
     this.currentLocation = options.currentLocation;
-
+    this.setState(state);
     // DEBUG ONLY!
     // this.travel = new Travel(
     //   options.currentLocation,
     //   new GameLocation(options.currentLocation.waypoint, 'b2690138-f58f-4e2e-829f-dfb0d7b39ab1'),
     // );
+  }
+
+  gameChanged() {
+    this.saveState();
+    this.emit('change');
+  }
+
+  saveState = debounce(() => {
+    saveGameState(this.getState());
+  }, 500);
+
+  setState(state?: GameState): void {
+    if (!state) {
+      return;
+    }
+
+    if (state.currentLocation) {
+      const loc = state.currentLocation;
+      const pos = loc.pos;
+      this.currentLocation = new GameLocation(loc.system, loc.waypoint, pos && new Point(pos.x, pos.y));
+    }
+  }
+
+  getState(): GameState {
+    return {
+      currentLocation: this.currentLocation,
+    };
   }
 
   hasSystem(id: string): boolean {
@@ -222,25 +274,38 @@ export class Game extends EventEmitter {
     }
 
     this.travel = new Travel(this.currentLocation, new GameLocation(this.currentLocation.system, id), 5000);
-    this.emit('change');
+    this.gameChanged();
 
     let intervalId = setInterval(() => {
       this.travel.tick();
-      this.emit('change');
-
-      console.log(this.travel.timeRemaining, this.travel.isDone);
+      this.gameChanged();
 
       if (this.travel.isDone) {
         this.travel = undefined;
         clearInterval(intervalId);
         this.currentLocation.waypoint = id;
-        this.emit('change');
+        this.gameChanged();
       }
     }, 50);
   }
 }
 
-const game = new Game({
+const loadGameState = () => {
+  try {
+    const state = JSON.parse(localStorage.getItem('game-state'));
+    console.log('Loaded game state:', state);
+    return state;
+  } catch (e) {
+    return {};
+  }
+};
+
+const saveGameState = state => {
+  localStorage.setItem('game-state', JSON.stringify(state));
+  console.log('Saved game state:', state);
+};
+
+const game = new Game(loadGameState(), {
   systems: [exampleSystem],
   currentLocation: new GameLocation(
     exampleSystem.id,
